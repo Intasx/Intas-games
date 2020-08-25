@@ -23,4 +23,4 @@ Compile the game with `nim main.nim`
 
 # Screenshots
 
-![](/Word_Search_Shooter_-_Python/WSS-nim.png)
+![](/Word_Search_Shooter_-_Nim/WSS-nim.png)
