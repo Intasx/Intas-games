@@ -19,4 +19,4 @@ Execute the game with `py main.py`
 
 # Screenshots
 
-![](/Word_Search_Shooter_-_Python/WSS-python.png)
+![](/Word%20Search%20Shooter%20-%20Python/WSS-python.png)
