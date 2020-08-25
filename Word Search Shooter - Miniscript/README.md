@@ -15,7 +15,7 @@ Play the game [here](https://intasx.github.io/Games/WSS/). This web build may be
 
 # Screenshots
 
-![](/Word_Search_Shooter_-_Miniscript/WSS-miniscript.png)
+![](/Word%20Search%20Shooter%20-%20Miniscript/WSS-miniscript.png)
 
 # Attribution
 
