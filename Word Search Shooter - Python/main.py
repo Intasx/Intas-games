@@ -65,7 +65,6 @@ while not closeGame:
 	elif enemyhp == 0:
 		grid.set_word("Level complete! Press any key to continue", 8, 1)
 		enemyhp = -0.01
-		pass
 	pygame.display.flip()
 
 pygame.quit()
