@@ -14,7 +14,7 @@ Click the letters to form the word and hit the `Shoot!` button. If the words is 
 #### Requirements (WINDOWS only):
 * Nim v1.2.4
 
-Compile the game with `nim main.nim`
+Compile the game with `nim c -r --verbosity:0 --app:gui -d:release main.nim`
 
 #### Requirements (other platforms):
 * Nim v1.2.4

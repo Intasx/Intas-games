@@ -29,32 +29,25 @@ const
 type letterInfo* = tuple[letter: string, color: Color, rect: Rectangle, x: int, y: int]
 type gridArray* = array[gridHeight, array[gridWidth, letterInfo]]
 
+type WordDirection* = enum
+    None, Hor, Ver, Dia
+
 var
     lettersOnScreen: gridArray
-    enemyColor*: Color
-    enemyHP* = Rectangle(x: 50, y: 320, width: 100, height: 30)
-    playerHP* = Rectangle(x: 50, y: 400, width: 100, height: 30)
-    wordsLeft* = newSeq[tuple[word: string, x: int, y: int]]()
-    amountWords*: int
-    gameOver* = false
-    levelComplete* = false
+    enemyColor*:     Color
+    amountWords*:    int
+    enemyHP*         = Rectangle(x: 50, y: 320, width: 100, height: 30)
+    playerHP*        = Rectangle(x: 50, y: 400, width: 100, height: 30)
+    wordsLeft*       = newSeq[tuple[word: string, x: int, y: int]]()
+    gameOver*        = false
+    levelComplete*   = false
 
 ## LoadFileText returns a ptr char, cast it to string with $
 ## and split it into a sequence of words
 let wordList = ($LoadFileText("englishWords.txt")).split("\n")
 
+# The random numbers must be different every time
 randomize()
-
-## used when inserting a word into the grid by a given orientation
-## hor: left to right, ver: up to down, dia: up-left to bottom-right
-proc moveLetter*(x, y: var int, ori: string) =
-    case ori
-        of "hor": inc x
-        of "ver": inc y
-        of "dia":
-            inc x
-            inc y
-        else: discard
 
 ## true if a given x-y is inside the enemy's body, false otherwise
 proc insideBody*(pos: Vector2): bool =
@@ -63,8 +56,19 @@ proc insideBody*(pos: Vector2): bool =
             return true
     return false
 
+## used when inserting a word into the grid by a given orientation
+## hor: left to right, ver: up to down, dia: up-left to bottom-right
+proc moveLetter*(x, y: var int, ori: WordDirection) =
+    case ori
+        of WordDirection.Hor: inc x
+        of WordDirection.Ver: inc y
+        of WordDirection.Dia:
+            inc x
+            inc y
+        else: discard
+
 ## Checks if a word fits in the enemy's body using the "-" characters
-proc wordFits(posx, posy: int, ori, word: string, letters: gridArray): bool =
+proc wordFits(posx, posy: int, ori: WordDirection, word: string, letters: gridArray): bool =
     var 
         x = posx
         y = posy
@@ -75,7 +79,7 @@ proc wordFits(posx, posy: int, ori, word: string, letters: gridArray): bool =
     return true
 
 ## Insert a word into the enemy's body
-proc insertWord*(posx, posy: int, ori, word: string, color: Color, letters: var gridArray) =
+proc insertWord*(posx, posy: int, ori: WordDirection, word: string, color: Color, letters: var gridArray) =
     var
         x = posx
         y = posy
@@ -92,7 +96,7 @@ proc generateGrid*(lettersOnScreen: var gridArray, level: int) =
     # Insert random letters and "-" in the enemy's body
     for y in 0 ..< gridHeight:
         for x in 0 ..< gridWidth:
-            pos = Vector2(x: float(x), y: float(y))
+            pos = Vector2(x: x.float, y: y.float)
             if pos.insideBody:
                 lettersOnScreen[y][x].letter = "-"
                 lettersOnScreen[y][x].color  = enemyColor
@@ -102,18 +106,17 @@ proc generateGrid*(lettersOnScreen: var gridArray, level: int) =
             lettersOnScreen[y][x].rect = Rectangle(x: float(x*20), y: float(y*20), width: 20.0, height: 20.0)
             lettersOnScreen[y][x].x = x
             lettersOnScreen[y][x].y = y
-
     # Insert random words from the list
     var
         words = wordList
         selWord: string
-        selOri: string
+        selOri: WordDirection
         x, y: int
         wordListX = 1
         wordListY = 5
         inserted: bool
     amountWords = rand(3..6)
-    let ori = ["hor", "ver", "dia"]
+    let ori = [WordDirection.Hor, WordDirection.Ver, WordDirection.Dia]
     for i in 1 .. amountWords:
         # Depending on the x-y coord and orientation the word
         # may or may not fit, wordFits takes care of that
@@ -137,12 +140,12 @@ proc generateGrid*(lettersOnScreen: var gridArray, level: int) =
         for x in 0 ..< gridWidth:
             if lettersOnScreen[y][x].letter == "-":
                 lettersOnScreen[y][x].letter = sample(letters)
-    insertWord(1, 3, "hor", "WORDS:", WHITE, lettersOnScreen)
+    insertWord(1, 3, WordDirection.Hor, "WORDS:", WHITE, lettersOnScreen)
     for w in wordsLeft:
-        insertWord(w.x, w.y, "hor", w.word.toUpperAscii, WHITE, lettersOnScreen)
-    insertWord(3, 15, "hor", "ENEMY", RED, lettersOnScreen)
-    insertWord(3, 19, "hor", "YOU", GREEN, lettersOnScreen)
-    insertWord(3, 23, "hor", "LEVEL:"&($level), WHITE, lettersOnScreen)
+        insertWord(w.x, w.y, WordDirection.Hor, w.word.toUpperAscii, WHITE, lettersOnScreen)
+    insertWord(3, 15, WordDirection.Hor, "ENEMY", RED, lettersOnScreen)
+    insertWord(3, 19, WordDirection.Hor, "YOU", GREEN, lettersOnScreen)
+    insertWord(3, 23, WordDirection.Hor, "LEVEL:" & $level, WHITE, lettersOnScreen)
 
 proc drawGrid*(lettersOnScreen: gridArray) =
     for y in 0 ..< gridHeight:

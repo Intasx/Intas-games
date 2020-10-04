@@ -20,7 +20,7 @@ proc initGame(letters: var gridArray, level: int, time: var Duration) =
 
 # This function could be a little more elegant...
 proc timer(lettersOnScreen: var gridArray, time: var Duration, delta: float32) =
-    let dt = initDuration(milliseconds = int32(delta))
+    let dt = initDuration(milliseconds = delta.int32)
     time -= dt
     var
         minutes = time.inMinutes
@@ -28,15 +28,14 @@ proc timer(lettersOnScreen: var gridArray, time: var Duration, delta: float32) =
     # Time's up, damage player and set a new time
     if minutes == 0 and seconds <= -1:
         time = initDuration(milliseconds = rand(60_000..70_000))
-        damage("player", lettersOnScreen)
+        Entity.Player.damage(lettersOnScreen)
         return
     seconds -= 60 * (seconds div 60)
     let
         mm = if minutes < 10: ("0" & $minutes) else: $minutes
         ss = if seconds < 10: ("0" & $seconds) else: $seconds
         res = mm & ":" & ss
-    #echo dt, " ", res
-    grid.insertWord(30, 25, "hor", res, WHITE, lettersOnScreen)
+    grid.insertWord(30, 25, WordDirection.Hor, res, WHITE, lettersOnScreen)
 
 
 var
@@ -71,13 +70,6 @@ while not WindowShouldClose():
         userinput.mouse(lettersOnScreen)
         if IsMouseButtonPressed(0):   userinput.mousePressed(0, lettersOnScreen)
         elif IsMouseButtonPressed(1): userinput.mousePressed(1, lettersOnScreen)
-    discard """
-    for i in 0..1000:
-        let 
-            posY = rand(0..gridHeight-1)
-            posX = rand(0..gridWidth-1)
-        lettersOnScreen[posY][posX].letter = sample(letters)
-    """
     # ----------------------------------------------------------------------------------
 
     #  Draw
